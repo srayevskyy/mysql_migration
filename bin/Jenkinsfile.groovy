@@ -1,6 +1,13 @@
 pipeline {
     agent any
     stages {
+
+        stage('Deploy_gfnsubs') {
+            steps {
+                sh 'whoami'
+            }
+        }
+
         stage('MySQL in docker') {
             agent {
                 docker {
