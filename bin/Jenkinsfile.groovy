@@ -18,6 +18,7 @@ pipeline {
             steps {
                 sh 'mysql --version'
                 sh 'ls -al'
+                sh "./bin/release.sh ${TARGET_HOST} 3306 root ${MYSQL_PASSWORD} dms_sample"
             }
         }
 
