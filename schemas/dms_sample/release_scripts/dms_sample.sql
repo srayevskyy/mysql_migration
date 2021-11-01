@@ -327,33 +327,6 @@ CREATE TABLE IF NOT EXISTS `dms_sample`.`ticket_purchase_hist` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
 
-USE `dms_sample` ;
-
--- -----------------------------------------------------
--- Placeholder table for view `dms_sample`.`sporting_event_info`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `dms_sample`.`sporting_event_info` (`event_id` INT, `sport` INT, `event_date_time` INT, `home_team` INT, `away_team` INT, `location` INT, `city` INT);
-
--- -----------------------------------------------------
--- Placeholder table for view `dms_sample`.`sporting_event_ticket_info`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `dms_sample`.`sporting_event_ticket_info` (`ticket_id` INT, `event_id` INT, `sport` INT, `event_date_time` INT, `home_team` INT, `away_team` INT, `location` INT, `city` INT, `seat_level` INT, `seat_section` INT, `seat_row` INT, `seat` INT, `ticket_price` INT, `ticketholder` INT);
-
--- -----------------------------------------------------
--- View `dms_sample`.`sporting_event_info`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `dms_sample`.`sporting_event_info`;
-DROP VIEW IF EXISTS `dms_sample`.`sporting_event_info` ;
-USE `dms_sample`;
-CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `dms_sample`.`sporting_event_info` AS select `e`.`id` AS `event_id`,`e`.`sport_type_name` AS `sport`,`e`.`start_date_time` AS `event_date_time`,`h`.`name` AS `home_team`,`a`.`name` AS `away_team`,`l`.`name` AS `location`,`l`.`city` AS `city` from (((`dms_sample`.`sporting_event` `e` join `dms_sample`.`sport_team` `h`) join `dms_sample`.`sport_team` `a`) join `dms_sample`.`sport_location` `l`) where ((`e`.`home_team_id` = `h`.`id`) and (`e`.`away_team_id` = `a`.`id`) and (`e`.`location_id` = `l`.`id`));
-
--- -----------------------------------------------------
--- View `dms_sample`.`sporting_event_ticket_info`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `dms_sample`.`sporting_event_ticket_info`;
-DROP VIEW IF EXISTS `dms_sample`.`sporting_event_ticket_info` ;
-USE `dms_sample`;
-CREATE  OR REPLACE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `dms_sample`.`sporting_event_ticket_info` AS select `t`.`id` AS `ticket_id`,`e`.`event_id` AS `event_id`,`e`.`sport` AS `sport`,`e`.`event_date_time` AS `event_date_time`,`e`.`home_team` AS `home_team`,`e`.`away_team` AS `away_team`,`e`.`location` AS `location`,`e`.`city` AS `city`,`t`.`seat_level` AS `seat_level`,`t`.`seat_section` AS `seat_section`,`t`.`seat_row` AS `seat_row`,`t`.`seat` AS `seat`,`t`.`ticket_price` AS `ticket_price`,`p`.`full_name` AS `ticketholder` from ((`dms_sample`.`sporting_event_ticket` `t` join `dms_sample`.`sporting_event_info` `e` on((`t`.`sporting_event_id` = `e`.`event_id`))) left join `dms_sample`.`person` `p` on((`t`.`ticketholder_id` = `p`.`ID`)));
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
