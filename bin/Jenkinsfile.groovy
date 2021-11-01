@@ -2,7 +2,7 @@ pipeline {
     agent any
     stages {
 
-        stage('Deploy_gfnsubs') {
+        stage('test') {
             steps {
                 sh 'whoami'
             }
