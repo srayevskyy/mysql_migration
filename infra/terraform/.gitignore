@@ -1,0 +1,6 @@
+.terraform*
+terraform.tfstate*
+.DS_Store
+*.pem
+terraform.tfvars.json
+ssh_into_ec2.sh
