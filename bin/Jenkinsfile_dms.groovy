@@ -3,9 +3,9 @@ pipeline {
     stages {
         stage('AWS cli in docker') {
             steps {
-                sh '
+                sh '''
 aws --version
-                '
+                '''
             }
         }
     }
