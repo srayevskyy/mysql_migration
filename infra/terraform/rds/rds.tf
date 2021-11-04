@@ -16,6 +16,16 @@ resource "aws_db_parameter_group" "src_old" {
     name  = "binlog_format"
     value = "ROW"
   }
+
+  parameter {
+    name  = "binlog_checksum"
+    value = "NONE"
+  }
+
+  parameter {
+    name  = "binlog_row_image"
+    value = "FULL"
+  }
 }
 
 resource "aws_db_parameter_group" "dst_new" {
@@ -30,11 +40,6 @@ resource "aws_db_parameter_group" "dst_new" {
   parameter {
     name  = "character_set_client"
     value = "utf8"
-  }
-
-  parameter {
-    name  = "binlog_format"
-    value = "ROW"
   }
 }
 
@@ -79,6 +84,7 @@ resource "aws_db_instance" "src_old" {
   identifier           = "mydbsrc"
   name                 = "mydbsrc"
   username             = "root"
+  backup_retention_period = 3
   password             = var.db_root_passwd
   parameter_group_name = aws_db_parameter_group.src_old.id
   db_subnet_group_name = aws_db_subnet_group.default.id
