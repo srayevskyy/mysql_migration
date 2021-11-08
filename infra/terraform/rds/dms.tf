@@ -81,7 +81,7 @@ resource "aws_dms_replication_subnet_group" "test" {
 # Create a replication instance
 resource "aws_dms_replication_instance" "src-to-dest" {
   replication_instance_id      = "src-to-dest-replication-instance"
-  replication_instance_class   = "dms.t3.micro"
+  replication_instance_class   = "dms.t3.small"
   allocated_storage            = 20
   apply_immediately            = true
   auto_minor_version_upgrade   = true
