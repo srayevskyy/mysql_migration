@@ -64,6 +64,15 @@ sudo apt-get update
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 sudo usermod -aG docker ubuntu
 sudo usermod -aG docker jenkins
+
+# Tools install
+sudo apt-get install -y mariadb-client awscli
+
+# env variable setup
+echo "MYSQL_SRC_HOST='${aws_db_instance.src_old.address}'" | sudo tee -a /etc/environment
+echo "MYSQL_DST_HOST='${aws_db_instance.dst_new.address}'" | sudo tee -a /etc/environment
+
+# restart Jenkins
 sudo service jenkins restart
 
 EOF
