@@ -38,7 +38,13 @@ resource "aws_instance" "public-ec2" {
         Name = "ec2-main"
     }
 
-    depends_on = [ module.vpc.vpc_id, module.vpc.igw_id, aws_db_instance.src_old, aws_db_instance.dst_new ]
+    depends_on = [ 
+      module.vpc.vpc_id, 
+      module.vpc.igw_id, 
+      aws_db_instance.src_old, 
+      aws_db_instance.dst_new,
+      aws_dms_replication_instance.src-to-dest, 
+    ]
 
     user_data = <<EOF
 #!/bin/sh
@@ -73,6 +79,9 @@ sudo apt-get install -y mariadb-client awscli
 # env variable setup
 echo "MYSQL_SRC_HOST='${aws_db_instance.src_old.address}'" | sudo tee -a /etc/environment
 echo "MYSQL_DST_HOST='${aws_db_instance.dst_new.address}'" | sudo tee -a /etc/environment
+echo "SOURCE_ENDPOINT_ARN='${aws_db_instance.src_old.arn}'" | sudo tee -a /etc/environment
+echo "TARGET_ENDPOINT_ARN='${aws_db_instance.dst_new.arn}'" | sudo tee -a /etc/environment
+echo "REPLICATION_INSTANCE_ARN='${aws_dms_replication_instance.src-to-dest.arn}'" | sudo tee -a /etc/environment
 
 # restart Jenkins
 sudo service jenkins restart
