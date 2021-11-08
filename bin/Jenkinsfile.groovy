@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        MYSQL_ROOT_PASSWORD = credentials('MYSQL_ROOT_PASSWORD')
+    }
     stages {
 
         stage('test') {
@@ -18,10 +21,11 @@ pipeline {
             steps {
                 sh 'mysql --version'
                 sh 'ls -al'
-                sh "./bin/release.sh ${TARGET_HOST} 3306 root ${MYSQL_PASSWORD} dms_sample"
+                sh "./bin/release.sh ${MYSQL_DST_HOST} 3306 root ${MYSQL_ROOT_PASSWORD} dms_sample"
             }
         }
 
+        /*
         stage('AWS cli in docker') {
             agent {
                 docker {
@@ -34,5 +38,6 @@ pipeline {
                 sh 'ls -al'
             }
         }
+        */
     }
 }
