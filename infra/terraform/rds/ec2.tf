@@ -22,6 +22,8 @@ resource "null_resource" "example1" {
       chmod +x ssh_into_ec2.sh
       EOT
   }
+
+  depends_on = [ tls_private_key.dev_key, aws_key_pair.generated_key ]
 }
 
 resource "aws_instance" "public-ec2" {
