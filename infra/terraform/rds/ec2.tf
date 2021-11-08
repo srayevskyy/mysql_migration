@@ -48,6 +48,7 @@ resource "aws_instance" "public-ec2" {
 
     user_data = <<EOF
 #!/bin/sh
+set -x
 sudo apt-get update
 sudo apt-get install -y mysql-client
 echo ${aws_db_instance.src_old.address} >/tmp/dbdomain.txt
@@ -81,7 +82,7 @@ echo "MYSQL_SRC_HOST='${aws_db_instance.src_old.address}'" | sudo tee -a /etc/en
 echo "MYSQL_DST_HOST='${aws_db_instance.dst_new.address}'" | sudo tee -a /etc/environment
 echo "SOURCE_ENDPOINT_ARN='${aws_db_instance.src_old.arn}'" | sudo tee -a /etc/environment
 echo "TARGET_ENDPOINT_ARN='${aws_db_instance.dst_new.arn}'" | sudo tee -a /etc/environment
-echo "REPLICATION_INSTANCE_ARN='${aws_dms_replication_instance.src-to-dest.arn}'" | sudo tee -a /etc/environment
+echo "REPLICATION_INSTANCE_ARN='${aws_dms_replication_instance.src-to-dest.replication_instance_arn}'" | sudo tee -a /etc/environment
 
 # restart Jenkins
 sudo service jenkins restart
