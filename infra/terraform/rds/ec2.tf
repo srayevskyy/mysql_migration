@@ -146,7 +146,7 @@ echo "REPLICATION_INSTANCE_ARN='${aws_dms_replication_instance.src-to-dest.repli
 # restart Jenkins
 sudo service jenkins restart
 
-# create iam user in mysql
+# create iam user in target mysql
 mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE DATABASE IF NOT EXISTS dms_sample"
 mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE USER IF NOT EXISTS iam_admin IDENTIFIED WITH AWSAuthenticationPlugin as 'RDS'"
 mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER ON dms_sample.* TO 'iam_admin'@'%' REQUIRE SSL"
