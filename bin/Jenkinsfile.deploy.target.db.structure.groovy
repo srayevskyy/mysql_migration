@@ -13,7 +13,8 @@ pipeline {
     stages {
         stage('MySQL in docker') {
             steps {
-                sh "mysql --host=${MYSQL_DST_HOST} --port=3306 --ssl-ca=${USER}/rds-ca-2019-root.pem --user=iam_admin --password=${TOKEN} -e 'SELECT 1+1'"
+                sh "echo ${MYSQL_TOKEN}"
+                sh "mysql --host=${MYSQL_DST_HOST} --port=3306 --ssl-ca=${USER}/rds-ca-2019-root.pem --user=iam_admin --password=${MYSQL_TOKEN} -e 'SELECT 1+1'"
                 // sh "./bin/release.sh ${MYSQL_DST_HOST} 3306 root ${MYSQL_ROOT_PASSWORD} dms_sample"
             }
         }
