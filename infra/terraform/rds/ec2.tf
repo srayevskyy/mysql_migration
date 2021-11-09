@@ -41,8 +41,8 @@ resource "aws_iam_policy" "my_iam_policy" {
   })
 }
 
-resource "aws_iam_role" "my_iam_role" {
-  name                = "my_iam_role"
+resource "aws_iam_role" "my_iam_role_ec2" {
+  name                = "my_iam_role_ec2"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -52,7 +52,7 @@ resource "aws_iam_role" "my_iam_role" {
         Effect = "Allow"
         Sid    = ""
         Principal = {
-          Service = "rds.amazonaws.com"
+          Service = "ec2.amazonaws.com"
         }
       },
     ]
@@ -61,27 +61,9 @@ resource "aws_iam_role" "my_iam_role" {
   managed_policy_arns = [ aws_iam_policy.my_iam_policy.arn ]
 }
 
-resource "aws_iam_role_policy" "test_policy" {
-  name = "test_policy"
-  role = aws_iam_role.test_role_rds.id
-
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "rds-db:connect",
-        Effect   = "Allow"
-        Resource = "arn:aws:rds-db:*:${data.aws_caller_identity.current.account_id}:dbuser:*/*"
-      },
-    ]
-  })
-}
-
 resource "aws_iam_instance_profile" "test_profile" {
   name = "test_profile"
-  role = "${aws_iam_role.my_iam_role.name}"
+  role = "${aws_iam_role.my_iam_role_ec2.name}"
 }
 
 resource "null_resource" "example1" {
