@@ -75,7 +75,7 @@ sudo usermod -aG docker ubuntu
 sudo usermod -aG docker jenkins
 
 # Tools install
-sudo apt-get install -y mariadb-client awscli
+sudo apt-get install -y mariadb-client libmariadbclient18 awscli
 
 # env variable setup
 echo "MYSQL_SRC_HOST='${aws_db_instance.src_old.address}'" | sudo tee -a /etc/environment
@@ -86,6 +86,10 @@ echo "REPLICATION_INSTANCE_ARN='${aws_dms_replication_instance.src-to-dest.repli
 
 # restart Jenkins
 sudo service jenkins restart
+
+# create iam user in mysql
+mysql -vvv -h ${MYSQL_DST_HOST} -P 3306 -u root -pfoobarbaz -e "CREATE USER IF NOT EXISTS iam_admin IDENTIFIED WITH AWSAuthenticationPlugin as 'RDS'"
+mysql -vvv -h ${MYSQL_DST_HOST} -P 3306 -u root -pfoobarbaz -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER ON *.* TO 'iam_admin'@'%' REQUIRE SSL"
 
 EOF
 }
