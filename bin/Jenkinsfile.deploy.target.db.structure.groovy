@@ -1,11 +1,4 @@
-def getEnvFromBranch(username) {
-    /*
-  if (branch == 'master') {
-    return 'production'
-  } else {
-    return 'staging'
-  }
-    */
+def getMySQLToken(username) {
     return sh (
         script: "aws rds generate-db-auth-token --hostname $MYSQL_DST_HOST --port 3306 --region us-west-2 --username iam_admin",
         returnStdout: true
