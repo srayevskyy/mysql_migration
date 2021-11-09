@@ -8,8 +8,7 @@ cd "${0%/*}"
 MYSQL_HOST=${1}
 MYSQL_PORT=${2}
 MYSQL_USER=${3}
-MYSQL_PASSWORD=${4}
-SRC_SCHEMA=${5}
+SRC_SCHEMA=${4}
 
 function deploy_scripts() {
 
@@ -18,7 +17,7 @@ DIRECTORY=${1}
 for i in $(ls -1 ../schemas/${SRC_SCHEMA}/${DIRECTORY}/*.sql)
 do
    echo "Executing '${i}' ..."
-   /usr/bin/mysql --ssl-ca=${USER}/rds-ca-2019-root.pem -vvv -h ${MYSQL_HOST} -P ${MYSQL_PORT} -u ${MYSQL_USER} -p${MYSQL_PASSWORD} < ${i}
+   mysql -vvv --host=${MYSQL_HOST} --port=${MYSQL_PORT} --ssl-ca=${USER}/rds-ca-2019-root.pem --user=${MYSQL_USER} --password="${MYSQL_TOKEN}" -e ${i}
 done
 
 }
