@@ -17,7 +17,7 @@ DIRECTORY=${1}
 for i in $(ls -1 ../schemas/${SRC_SCHEMA}/${DIRECTORY}/*.sql)
 do
    echo "Executing '${i}' ..."
-   mysql -vvv --host=${MYSQL_HOST} --port=${MYSQL_PORT} --ssl-ca=${USER}/rds-ca-2019-root.pem --user=${MYSQL_USER} --password="${MYSQL_TOKEN}" -e ${i}
+   mysql -vvv --host=${MYSQL_HOST} --port=${MYSQL_PORT} --ssl-ca=${HOME}/rds-ca-2019-root.pem --user=${MYSQL_USER} --password="${MYSQL_TOKEN}" -e ${i}
 done
 
 }
