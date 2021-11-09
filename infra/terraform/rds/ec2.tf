@@ -167,7 +167,7 @@ sudo service jenkins restart
 # create iam user in mysql
 mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE DATABASE IF NOT EXISTS dms_sample"
 mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE USER IF NOT EXISTS iam_admin IDENTIFIED WITH AWSAuthenticationPlugin as 'RDS'"
-mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER ON dms_sample.* TO 'iam_admin'@'%' REQUIRE SSL"
+mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER ON dms_sample.* TO 'iam_admin'@'%' REQUIRE SSL"
 
 EOF
 }
