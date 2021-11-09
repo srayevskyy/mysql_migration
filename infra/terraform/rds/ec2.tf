@@ -8,6 +8,82 @@ resource "aws_key_pair" "generated_key" {
   public_key = tls_private_key.dev_key.public_key_openssh
 }
 
+resource "aws_iam_role" "test_role_rds" {
+  name = "test_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "my_iam_policy" {
+  name = "my_iam_policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "rds-db:connect",
+        Effect   = "Allow"
+        Resource = "arn:aws:rds-db:*:${data.aws_caller_identity.current.account_id}:dbuser:*/*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role" "my_iam_role" {
+  name                = "my_iam_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+      },
+    ]
+  })
+
+  managed_policy_arns = [ aws_iam_policy.my_iam_policy.arn ]
+}
+
+resource "aws_iam_role_policy" "test_policy" {
+  name = "test_policy"
+  role = aws_iam_role.test_role_rds.id
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "rds-db:connect",
+        Effect   = "Allow"
+        Resource = "arn:aws:rds-db:*:${data.aws_caller_identity.current.account_id}:dbuser:*/*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_instance_profile" "test_profile" {
+  name = "test_profile"
+  role = "${aws_iam_role.my_iam_role.name}"
+}
+
 resource "null_resource" "example1" {
   provisioner "local-exec" {    # Generate "terraform-key-pair.pem" in current directory
     command = <<-EOT
@@ -33,6 +109,7 @@ resource "aws_instance" "public-ec2" {
     key_name      = var.generated_key_name
     vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
     associate_public_ip_address = true
+    iam_instance_profile = "${aws_iam_instance_profile.test_profile.name}"
 
     tags = {
         Name = "ec2-main"
@@ -88,8 +165,9 @@ echo "REPLICATION_INSTANCE_ARN='${aws_dms_replication_instance.src-to-dest.repli
 sudo service jenkins restart
 
 # create iam user in mysql
+mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE DATABASE IF NOT EXISTS dms_sample"
 mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE USER IF NOT EXISTS iam_admin IDENTIFIED WITH AWSAuthenticationPlugin as 'RDS'"
-mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER ON *.* TO 'iam_admin'@'%' REQUIRE SSL"
+mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER ON dms_sample.* TO 'iam_admin'@'%' REQUIRE SSL"
 
 EOF
 }
