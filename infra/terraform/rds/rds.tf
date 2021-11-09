@@ -92,6 +92,7 @@ resource "aws_db_instance" "src_old" {
   publicly_accessible  = false
   skip_final_snapshot  = true
   multi_az             = false
+  iam_database_authentication_enabled = true
 }
 
 resource "aws_db_instance" "dst_new" {
@@ -110,4 +111,5 @@ resource "aws_db_instance" "dst_new" {
   publicly_accessible  = false
   skip_final_snapshot  = true
   multi_az             = false
+  iam_database_authentication_enabled = true
 }
