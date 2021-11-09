@@ -15,7 +15,6 @@ def getEnvFromBranch(username) {
 pipeline {
     agent any
     environment {
-        MYSQL_ROOT_PASSWORD = credentials('MYSQL_ROOT_PASSWORD')
         MYSQL_TOKEN = getMySQLToken("iam_admin")
     }
     stages {
