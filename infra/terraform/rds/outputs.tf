@@ -71,6 +71,10 @@ output "db-id_dst_new" {
     value = aws_db_instance.dst_new.id
 }
 
+output "db-id_dst_new_DbiResourceId" {
+    value = aws_db_instance.dst_new.resource_id
+}
+
 output "db-name_dst_new" {
     value = aws_db_instance.dst_new.name
 }

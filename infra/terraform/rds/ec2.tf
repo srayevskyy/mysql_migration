@@ -17,7 +17,7 @@ resource "aws_iam_policy" "my_iam_policy" {
       {
           "Effect": "Allow",
           "Action": [ "rds-db:connect" ],
-          "Resource": [ "arn:aws:rds-db:*:${data.aws_caller_identity.current.account_id}:dbuser:*/*" ]
+          "Resource": [ "arn:aws:rds-db:us-west-2:${data.aws_caller_identity.current.account_id}:dbuser:${aws_db_instance.dst_new.resource_id}/iam_admin" ]
       },
       {
           "Effect": "Allow",
