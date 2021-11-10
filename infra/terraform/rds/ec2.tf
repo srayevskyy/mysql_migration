@@ -8,6 +8,7 @@ resource "aws_key_pair" "generated_key" {
   public_key = tls_private_key.dev_key.public_key_openssh
 }
 
+/*
 resource "aws_iam_role" "test_role_rds" {
   name = "test_role"
 
@@ -25,6 +26,7 @@ resource "aws_iam_role" "test_role_rds" {
     ]
   })
 }
+*/
 
 resource "aws_iam_policy" "my_iam_policy" {
   name = "my_iam_policy"
@@ -33,10 +35,32 @@ resource "aws_iam_policy" "my_iam_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "rds-db:connect",
-        Effect   = "Allow"
-        Resource = "arn:aws:rds-db:*:${data.aws_caller_identity.current.account_id}:dbuser:*/*"
+          "Effect": "Allow",
+          "Action": "dms:DescribeReplicationTasks",
+          "Resource": "*"
       },
+      {
+          "Effect": "Allow",
+          "Action": [
+              "dms:ModifyReplicationTask",
+              "dms:StartReplicationTask",
+              "rds-db:connect",
+              "dms:DeleteReplicationTask",
+              "dms:StopReplicationTask",
+              "dms:CreateReplicationTask"
+          ],
+          "Resource": [
+              "arn:aws:dms:*:${data.aws_caller_identity.current.account_id}:task:*",
+              "arn:aws:dms:*:${data.aws_caller_identity.current.account_id}:endpoint:*",
+              "arn:aws:dms:*:${data.aws_caller_identity.current.account_id}:rep:*",
+              "arn:aws:rds-db:*:${data.aws_caller_identity.current.account_id}:dbuser:*/*"
+          ]
+      }      
+      # {
+      #   Action = "rds-db:connect",
+      #   Effect   = "Allow"
+      #   Resource = "arn:aws:rds-db:*:${data.aws_caller_identity.current.account_id}:dbuser:*/*"
+      # },
     ]
   })
 }
