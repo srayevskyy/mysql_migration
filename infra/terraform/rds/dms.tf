@@ -56,7 +56,6 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
   role       = aws_iam_role.dms-cloudwatch-logs-role.name
 }
 
-/*
 resource "aws_iam_role" "dms-vpc-role" {
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
   name               = "dms-vpc-role"
@@ -66,7 +65,6 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
   role       = aws_iam_role.dms-vpc-role.name
 }
-*/
 
 resource "aws_dms_replication_subnet_group" "test" {
   replication_subnet_group_description = "Test replication subnet group"
@@ -98,6 +96,6 @@ resource "aws_dms_replication_instance" "src-to-dest" {
   depends_on = [
     aws_iam_role_policy_attachment.dms-access-for-endpoint-AmazonDMSRedshiftS3Role,
     aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole,
-    /* aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole */
+    aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
   ]
 }

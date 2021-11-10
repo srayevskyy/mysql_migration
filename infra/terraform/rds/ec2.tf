@@ -48,7 +48,7 @@ resource "aws_iam_policy" "my_iam_policy" {
 }
 
 resource "aws_iam_role" "my_iam_role_ec2" {
-  name                = "my_iam_role_ec2"
+  name = "my_iam_role_ec2"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -67,8 +67,8 @@ resource "aws_iam_role" "my_iam_role_ec2" {
   managed_policy_arns = [ aws_iam_policy.my_iam_policy.arn ]
 }
 
-resource "aws_iam_instance_profile" "test_profile" {
-  name = "test_profile"
+resource "aws_iam_instance_profile" "my_iam_instance_profile" {
+  name = "my_iam_instance_profile"
   role = "${aws_iam_role.my_iam_role_ec2.name}"
 }
 
@@ -97,7 +97,7 @@ resource "aws_instance" "public-ec2" {
     key_name      = var.generated_key_name
     vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
     associate_public_ip_address = true
-    iam_instance_profile = "${aws_iam_instance_profile.test_profile.name}"
+    iam_instance_profile = "${aws_iam_instance_profile.my_iam_instance_profile.name}"
 
     tags = {
         Name = "ec2-main"
