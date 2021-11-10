@@ -21,6 +21,11 @@ resource "aws_iam_policy" "my_iam_policy" {
       },
       {
           "Effect": "Allow",
+          "Action": [ "rds-db:connect" ],
+          "Resource": [ "arn:aws:rds-db:us-west-2:${data.aws_caller_identity.current.account_id}:dbuser:${aws_db_instance.src_old.resource_id}/iam_admin" ]
+      },
+      {
+          "Effect": "Allow",
           "Action": [ 
             "dms:DescribeReplicationTasks", 
             "dms:DescribeEndpoints", 
@@ -114,6 +119,14 @@ resource "aws_instance" "public-ec2" {
     user_data = <<EOF
 #!/bin/sh
 set -x
+
+# env variable setup
+echo "MYSQL_SRC_HOST='${aws_db_instance.src_old.address}'" | sudo tee -a /etc/environment
+echo "MYSQL_DST_HOST='${aws_db_instance.dst_new.address}'" | sudo tee -a /etc/environment
+echo "SOURCE_ENDPOINT_ARN='${aws_dms_endpoint.mydbsrc.endpoint_arn}'" | sudo tee -a /etc/environment
+echo "TARGET_ENDPOINT_ARN='${aws_dms_endpoint.mydbdst.endpoint_arn}'" | sudo tee -a /etc/environment
+echo "REPLICATION_INSTANCE_ARN='${aws_dms_replication_instance.src-to-dest.replication_instance_arn}'" | sudo tee -a /etc/environment
+
 sudo apt-get update
 sudo apt-get install -y mysql-client
 echo ${aws_db_instance.src_old.address} >/tmp/dbdomain.txt
@@ -142,13 +155,6 @@ sudo usermod -aG docker jenkins
 # Tools install
 sudo apt-get install -y mariadb-client libmariadbclient18 awscli
 
-# env variable setup
-echo "MYSQL_SRC_HOST='${aws_db_instance.src_old.address}'" | sudo tee -a /etc/environment
-echo "MYSQL_DST_HOST='${aws_db_instance.dst_new.address}'" | sudo tee -a /etc/environment
-echo "SOURCE_ENDPOINT_ARN='${aws_dms_endpoint.mydbsrc.endpoint_arn}'" | sudo tee -a /etc/environment
-echo "TARGET_ENDPOINT_ARN='${aws_dms_endpoint.mydbdst.endpoint_arn}'" | sudo tee -a /etc/environment
-echo "REPLICATION_INSTANCE_ARN='${aws_dms_replication_instance.src-to-dest.replication_instance_arn}'" | sudo tee -a /etc/environment
-
 # restart Jenkins
 sudo service jenkins restart
 
@@ -156,6 +162,11 @@ sudo service jenkins restart
 mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE DATABASE IF NOT EXISTS dms_sample"
 mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE USER IF NOT EXISTS iam_admin IDENTIFIED WITH AWSAuthenticationPlugin as 'RDS'"
 mysql -vvv -h ${aws_db_instance.dst_new.address} -P 3306 -u root -p${var.db_root_passwd} -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER ON dms_sample.* TO 'iam_admin'@'%' REQUIRE SSL"
+
+# create iam user in source mysql
+mysql -vvv -h ${aws_db_instance.src_old.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE DATABASE IF NOT EXISTS dms_sample"
+mysql -vvv -h ${aws_db_instance.src_old.address} -P 3306 -u root -p${var.db_root_passwd} -e "CREATE USER iam_admin IDENTIFIED WITH AWSAuthenticationPlugin as 'RDS'" || true
+mysql -vvv -h ${aws_db_instance.src_old.address} -P 3306 -u root -p${var.db_root_passwd} -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER ON dms_sample.* TO 'iam_admin'@'%' REQUIRE SSL"
 
 EOF
 }
