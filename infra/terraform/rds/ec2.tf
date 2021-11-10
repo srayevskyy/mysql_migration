@@ -38,14 +38,10 @@ resource "aws_iam_policy" "my_iam_policy" {
           "Action": [
               "dms:ModifyReplicationTask",
               "dms:StartReplicationTask",
-              "dms:DeleteReplicationTask",
-              "dms:StopReplicationTask",
-              "dms:CreateReplicationTask",
+              "dms:StopReplicationTask"          
           ],
           "Resource": [
-              "arn:aws:dms:*:${data.aws_caller_identity.current.account_id}:task:*",
-              "arn:aws:dms:*:${data.aws_caller_identity.current.account_id}:endpoint:*",
-              "arn:aws:dms:*:${data.aws_caller_identity.current.account_id}:rep:*",
+              "arn:aws:dms:us-west-2:${data.aws_caller_identity.current.account_id}:task:HHJ6JFBCQZXEAUWKO6XRGZZK7HTOWHD42RULSZQ"
           ]
       }      
     ]
