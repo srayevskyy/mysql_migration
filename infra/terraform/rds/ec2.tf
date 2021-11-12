@@ -26,9 +26,9 @@ resource "aws_iam_policy" "my_iam_policy" {
       },
       {
           "Effect": "Allow",
-          "Action": [ 
-            "dms:DescribeReplicationTasks", 
-            "dms:DescribeEndpoints", 
+          "Action": [
+            "dms:DescribeReplicationTasks",
+            "dms:DescribeEndpoints",
             "dms:DescribeReplicationInstances",
           ],
           "Resource": "*"
@@ -38,12 +38,12 @@ resource "aws_iam_policy" "my_iam_policy" {
           "Action": [
               "dms:ModifyReplicationTask",
               "dms:StartReplicationTask",
-              "dms:StopReplicationTask"          
+              "dms:StopReplicationTask"
           ],
           "Resource": [
-              "arn:aws:dms:us-west-2:${data.aws_caller_identity.current.account_id}:task:HHJ6JFBCQZXEAUWKO6XRGZZK7HTOWHD42RULSZQ"
+              "${aws_dms_replication_task.src_to_dest_terraform.replication_task_arn}"
           ]
-      }      
+      }
     ]
   })
 }

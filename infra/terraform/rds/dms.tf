@@ -99,3 +99,12 @@ resource "aws_dms_replication_instance" "src-to-dest" {
     aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
   ]
 }
+
+resource "aws_dms_replication_task" "src_to_dest_terraform" {
+  migration_type            = "full-load-and-cdc"
+  replication_instance_arn  = aws_dms_replication_instance.src-to-dest.replication_instance_arn
+  replication_task_id       = "src-to-dest-terraform"
+  source_endpoint_arn       = aws_dms_endpoint.mydbsrc.endpoint_arn
+  target_endpoint_arn       = aws_dms_endpoint.mydbdst.endpoint_arn
+  table_mappings            = file("${path.module}/table_mappings.json")
+}
