@@ -26,3 +26,11 @@ variable "generated_key_name" {
 variable "db_root_passwd" {
   type = string
 }
+
+variable "jenkins_admin_password" {
+  type = string
+}
+
+variable "JENKINS_HOME" {
+  default = "/var/lib/jenkins"
+}

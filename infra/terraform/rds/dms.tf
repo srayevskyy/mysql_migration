@@ -66,7 +66,7 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   role       = aws_iam_role.dms-vpc-role.name
 }
 
-resource "aws_dms_replication_subnet_group" "test" {
+resource "aws_dms_replication_subnet_group" "my_replication_subnet_group" {
   replication_subnet_group_description = "Test replication subnet group"
   replication_subnet_group_id          = "test-dms-replication-subnet-group-tf"
 
@@ -74,12 +74,14 @@ resource "aws_dms_replication_subnet_group" "test" {
     module.vpc.subnet_private1_id, module.vpc.subnet_private2_id
   ]
 
+  tags = {}
 }
 
 # Create a replication instance
 resource "aws_dms_replication_instance" "src-to-dest" {
   replication_instance_id      = "src-to-dest-replication-instance"
-  replication_instance_class   = "dms.t3.small"
+  #replication_instance_class   = "dms.t3.small"
+  replication_instance_class   = "dms.t3.micro"
   allocated_storage            = 20
   apply_immediately            = true
   auto_minor_version_upgrade   = true
@@ -89,7 +91,7 @@ resource "aws_dms_replication_instance" "src-to-dest" {
   preferred_maintenance_window = "sun:10:30-sun:14:30"
   publicly_accessible          = false
 
-  replication_subnet_group_id  = aws_dms_replication_subnet_group.test.id
+  replication_subnet_group_id  = aws_dms_replication_subnet_group.my_replication_subnet_group.id
 
   vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
 
